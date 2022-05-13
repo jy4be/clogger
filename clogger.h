@@ -8,7 +8,7 @@
 
 typedef struct {
         FILE *restrict stream;
-        int severety;
+        int severity;
         int settings;
 } Journal;
 
@@ -38,7 +38,7 @@ extern const Journal STD_JOURNAL;
 
 int _log(const char *file,
          const int line,
-         const int severety,
+         const int severity,
          const Journal filename, 
          const char *restrict msg, 
          ...);

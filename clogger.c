@@ -41,7 +41,7 @@ void get_time_string(char *buffer);
 void set_logger_info(const Journal journal,
                      const char *restrict file,
                      const int line,
-                     const int severety,
+                     const int severity,
                      char *restrict time_string,
                      char *restrict level_string,
                      char *restrict trace_string);
@@ -49,7 +49,7 @@ void set_logger_info(const Journal journal,
 
 int _log(const char *file,
          const int line,
-         const int severety,
+         const int severity,
          const Journal journal,
          const char *restrict msg,
          ...)
@@ -59,7 +59,7 @@ int _log(const char *file,
         char level_string[9]  = "";
         char trace_string[64] = "";
         
-        set_logger_info(journal, file, line, severety, time_string, level_string, trace_string);
+        set_logger_info(journal, file, line, severity, time_string, level_string, trace_string);
 
         bool is_color      = is_setting(journal.settings, LOGGER_COLOR);
         bool is_echo       = is_setting(journal.settings, LOGGER_ECHO_STD);
@@ -68,18 +68,18 @@ int _log(const char *file,
         bool is_flush      = is_setting(journal.settings, LOGGER_FLUSH);
         bool is_echo_flush = is_setting(journal.settings, LOGGER_ECHO_FLUSH);
 
-        bool is_severety_sufficient      = severety >= journal.severety ||
+        bool is_severity_sufficient      = severity >= journal.severity ||
                                            !is_setting(journal.settings, LOGGER_ONLY_SEVERE);
 
-        bool is_echo_severety_sufficient = severety >= journal.severety ||
+        bool is_echo_severity_sufficient = severity >= journal.severity ||
                                            !is_setting(journal.settings, LOGGER_ECHO_ONLY_SEVERE);
 
         va_list fprint_args;
         va_start (fprint_args, msg);
 
-        if (journal.stream && is_severety_sufficient)
+        if (journal.stream && is_severity_sufficient)
                 fprint_return = log_to_stream(time_string,
-                              _log_ansi_colors[severety],
+                              _log_ansi_colors[severity],
                               level_string,
                               trace_string,
                               journal.stream,
@@ -92,10 +92,10 @@ int _log(const char *file,
 
         va_start(fprint_args, msg);
 
-        if (is_echo && is_echo_severety_sufficient) {
-                if (severety >= journal.severety && is_echo_error)
+        if (is_echo && is_echo_severity_sufficient) {
+                if (severity >= journal.severity && is_echo_error)
                         fprint_return = log_to_stream(time_string,
-                                      _log_ansi_colors[severety],
+                                      _log_ansi_colors[severity],
                                       level_string,
                                       trace_string,
                                       stderr,
@@ -104,7 +104,7 @@ int _log(const char *file,
                                       fprint_args);
                 else
                         fprint_return = log_to_stream(time_string,
-                                      _log_ansi_colors[severety],
+                                      _log_ansi_colors[severity],
                                       level_string,
                                       trace_string,
                                       stdout,
@@ -126,7 +126,7 @@ int _log(const char *file,
 void set_logger_info(const Journal journal,
                      const char *restrict file,
                      const int line,
-                     const int severety,
+                     const int severity,
                      char *restrict time_string,
                      char *restrict level_string,
                      char *restrict trace_string)
@@ -134,7 +134,7 @@ void set_logger_info(const Journal journal,
         if (is_setting(journal.settings, LOGGER_TIME)) 
                 get_time_string(time_string);
 
-        strncpy(level_string, _log_level_strings[severety], 8);
+        strncpy(level_string, _log_level_strings[severity], 8);
 
         if (is_setting(journal.settings, LOGGER_TRACE)) 
                 get_trace_string(trace_string, 64, file, line);
